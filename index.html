@@ -1,0 +1,1149 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+<title>Misi Detektif Materi</title>
+<style>
+  :root{
+    --ink:#11162a;
+    --ink-2:#171f3a;
+    --panel:#1c2545;
+    --panel-2:#232d54;
+    --line:rgba(232,163,61,0.22);
+    --paper:#f4efe0;
+    --paper-dim:#c9c3ac;
+    --amber:#e8a33d;
+    --amber-2:#ffcf7a;
+    --teal:#2fb6a3;
+    --red:#ff6b57;
+    --shadow: 0 14px 30px rgba(0,0,0,0.35);
+    --radius: 14px;
+  }
+  *{box-sizing:border-box;}
+  html,body{margin:0;padding:0;}
+  body{
+    background:
+      radial-gradient(circle at 15% 8%, rgba(232,163,61,0.10), transparent 40%),
+      radial-gradient(circle at 85% 85%, rgba(47,182,163,0.10), transparent 45%),
+      var(--ink);
+    color:var(--paper);
+    font-family: Georgia, "Times New Roman", serif;
+    min-height:100vh;
+    max-width:100%;
+    overflow-x:hidden;
+    -webkit-text-size-adjust:100%;
+  }
+  .sans{ font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; }
+  ::selection{ background:var(--amber); color:#221704; }
+
+  /* ---------- App frame ---------- */
+  #app{ max-width:640px; margin:0 auto; min-height:100vh; display:flex; flex-direction:column; }
+
+  header.topbar{
+    position:sticky; top:0; z-index:20;
+    background:linear-gradient(180deg, var(--ink) 70%, rgba(17,22,42,0));
+    padding:14px 16px 10px;
+  }
+  .brand{
+    display:flex; align-items:center; gap:10px; margin-bottom:10px;
+  }
+  .brand .badge{
+    width:38px;height:38px;border-radius:50%;
+    background:radial-gradient(circle at 35% 30%, var(--amber-2), var(--amber) 60%, #8a5c17 100%);
+    display:flex;align-items:center;justify-content:center;font-size:20px;flex:none;
+    box-shadow:0 3px 8px rgba(0,0,0,0.4);
+  }
+  .brand h1{ font-size:16px; margin:0; letter-spacing:0.02em; line-height:1.25; }
+  .brand p{ margin:1px 0 0; font-size:11px; color:var(--paper-dim); font-family:inherit; }
+
+  .progresswrap{ margin-top:4px; }
+  .progress-label{
+    display:flex; justify-content:space-between; align-items:baseline;
+    font-family: "Courier New", monospace; font-size:11px; color:var(--amber-2);
+    letter-spacing:0.04em; margin-bottom:5px;
+  }
+  .progress-track{
+    height:7px; border-radius:6px; background:var(--panel);
+    border:1px solid var(--line); overflow:hidden;
+  }
+  .progress-fill{
+    height:100%; border-radius:6px;
+    background:linear-gradient(90deg, var(--amber) 0%, var(--teal) 130%);
+    transition:width .35s ease; width:0%;
+  }
+
+  main{ flex:1; padding:6px 16px 130px; }
+  .step{ display:none; animation:fadeIn .3s ease; }
+  .step.active{ display:block; }
+  @keyframes fadeIn{ from{opacity:0; transform:translateY(6px);} to{opacity:1; transform:translateY(0);} }
+
+  .card{
+    background:linear-gradient(180deg, var(--panel), var(--panel-2));
+    border:1px solid var(--line);
+    border-radius:var(--radius);
+    padding:18px 16px;
+    box-shadow:var(--shadow);
+    margin-bottom:14px;
+    position:relative;
+  }
+  .tag{
+    display:inline-block; font-family:"Courier New", monospace; font-size:11px;
+    letter-spacing:0.06em; color:var(--ink); background:var(--amber-2);
+    padding:3px 9px; border-radius:5px; transform:rotate(-1.5deg);
+    box-shadow:0 2px 5px rgba(0,0,0,0.3); margin-bottom:10px;
+  }
+  h2.step-title{ font-size:21px; margin:0 0 6px; line-height:1.3; }
+  .lede{ font-size:14.5px; line-height:1.6; color:var(--paper-dim); margin:0 0 16px; }
+  .lede b{ color:var(--paper); }
+
+  label.field-label{
+    display:block; font-family:inherit; font-size:14px; color:var(--amber-2);
+    margin:16px 0 7px; font-weight:bold;
+  }
+  label.field-label small{ display:block; font-family:inherit; font-size:11.5px; color:var(--paper-dim); font-weight:normal; margin-top:2px;}
+
+  input[type=text], textarea{
+    width:100%; font-family:inherit; font-size:15.5px; color:var(--paper);
+    background:rgba(0,0,0,0.22); border:1.5px solid var(--line);
+    border-radius:10px; padding:11px 13px; outline:none;
+    transition:border-color .15s, box-shadow .15s;
+  }
+  input[type=text]:focus, textarea:focus{
+    border-color:var(--amber); box-shadow:0 0 0 3px rgba(232,163,61,0.15);
+  }
+  textarea{ resize:none; overflow:hidden; min-height:76px; line-height:1.5; }
+  .field-error input, .field-error textarea, .field-error .chiprow{
+    border-color:var(--red) !important; box-shadow:0 0 0 3px rgba(255,107,87,0.15) !important;
+  }
+  .error-msg{ display:none; color:var(--red); font-size:12.5px; margin-top:6px; font-family: -apple-system,sans-serif; }
+  .field-error .error-msg{ display:block; }
+
+  .chiprow{ display:flex; flex-wrap:wrap; gap:8px; padding:4px; border-radius:12px; border:1.5px solid transparent; }
+  .chip{
+    font-family: -apple-system, sans-serif; font-size:13.5px; font-weight:600;
+    padding:9px 14px; border-radius:999px; cursor:pointer; user-select:none;
+    background:rgba(0,0,0,0.22); border:1.5px solid var(--line); color:var(--paper-dim);
+    transition:all .15s;
+  }
+  .chip.sel{
+    background:linear-gradient(135deg, var(--amber), #c97f22); color:#241703; border-color:var(--amber);
+    box-shadow:0 3px 8px rgba(232,163,61,0.35);
+  }
+  .chip:active{ transform:scale(0.96); }
+
+  .canvasbox{ margin-top:8px; }
+  .canvas-toolbar{ display:flex; justify-content:space-between; align-items:center; margin-bottom:7px; }
+  .canvas-toolbar .opt-label{ font-size:11.5px; color:var(--paper-dim); font-family:-apple-system,sans-serif; letter-spacing:0.03em;}
+  .btn-mini{
+    font-family:-apple-system,sans-serif; font-size:12px; font-weight:600; color:var(--paper-dim);
+    background:rgba(0,0,0,0.25); border:1px solid var(--line); border-radius:7px;
+    padding:5px 10px; cursor:pointer;
+  }
+  canvas.sketch{
+    display:block; width:100%; height:200px; border-radius:10px;
+    background:#fbf6e6; border:1.5px solid var(--line); touch-action:none;
+  }
+
+  .swatches{
+    display:flex; flex-wrap:wrap; gap:8px; margin-bottom:9px;
+    background:rgba(0,0,0,0.18); border:1.5px solid var(--line); border-radius:12px; padding:9px;
+  }
+  .swatch{
+    width:26px; height:26px; border-radius:50%; cursor:pointer; flex:none;
+    border:2.5px solid rgba(255,255,255,0.15); transition:transform .12s, border-color .12s;
+  }
+  .swatch.sel{ border-color:#fff; transform:scale(1.14); box-shadow:0 0 0 2px rgba(0,0,0,0.35); }
+  .swatch:active{ transform:scale(0.92); }
+
+  .toolrow{
+    display:flex; align-items:center; justify-content:space-between; gap:10px; margin-bottom:9px;
+    flex-wrap:wrap;
+  }
+  .sizes{
+    display:flex; align-items:center; gap:12px; background:rgba(0,0,0,0.18);
+    border:1.5px solid var(--line); border-radius:999px; padding:8px 14px;
+  }
+  .brush-dot{
+    border-radius:50%; background:var(--paper-dim); cursor:pointer; flex:none;
+    transition:transform .12s, background .12s; border:2px solid transparent;
+  }
+  .brush-dot.size-s{ width:7px; height:7px; }
+  .brush-dot.size-m{ width:13px; height:13px; }
+  .brush-dot.size-l{ width:19px; height:19px; }
+  .brush-dot.sel{ background:var(--amber); border-color:var(--amber-2); transform:scale(1.1); }
+
+  .tools{ display:flex; gap:8px; }
+  .tool-btn{
+    font-family:-apple-system,sans-serif; font-size:15px; line-height:1;
+    width:38px; height:38px; border-radius:10px; cursor:pointer;
+    background:rgba(0,0,0,0.22); border:1.5px solid var(--line); color:var(--paper-dim);
+    display:flex; align-items:center; justify-content:center;
+  }
+  .tool-btn.sel{ background:linear-gradient(135deg, var(--teal), #1c7a6d); color:#fff; border-color:transparent; }
+  .tool-btn:active{ transform:scale(0.94); }
+
+  .toast{
+    position:fixed; left:50%; bottom:96px; transform:translateX(-50%) translateY(12px);
+    background:#241703; color:var(--amber-2); font-family:-apple-system,sans-serif;
+    font-size:13.5px; font-weight:600; padding:11px 18px; border-radius:999px;
+    box-shadow:0 8px 22px rgba(0,0,0,0.45); z-index:60; opacity:0;
+    transition:opacity .25s, transform .25s; pointer-events:none; max-width:88%; text-align:center;
+  }
+  .toast.show{ opacity:1; transform:translateX(-50%) translateY(0); }
+
+  .modal{ position:fixed; inset:0; z-index:100; display:none; align-items:center; justify-content:center; background:rgba(5,8,20,0.75); padding:20px; }
+  .modal.show{ display:flex; }
+  .modal-box{ background:var(--panel); border:1px solid var(--line); border-radius:16px; padding:22px 18px; max-width:380px; width:100%; font-family:-apple-system,sans-serif; }
+  .modal-box h3{ margin:0 0 8px; font-size:17px; color:var(--amber-2); }
+  .modal-box p{ margin:0 0 18px; font-size:13.5px; line-height:1.6; color:var(--paper-dim); }
+  .modal-actions{ display:flex; gap:10px; }
+  @media print{ .modal{ display:none !important; } }
+
+  /* Bottom nav */
+  .navbar{
+    position:fixed; left:0; right:0; bottom:0; z-index:30;
+    background:linear-gradient(0deg, var(--ink) 65%, rgba(17,22,42,0));
+    padding:14px 16px 18px;
+  }
+  .navbar-inner{ max-width:640px; margin:0 auto; display:flex; gap:10px; }
+  button.nav-btn{
+    flex:1; font-family:-apple-system, sans-serif; font-size:15px; font-weight:700;
+    padding:14px 10px; border-radius:12px; border:none; cursor:pointer;
+    letter-spacing:0.01em;
+  }
+  .btn-prev{ background:rgba(255,255,255,0.06); color:var(--paper-dim); border:1.5px solid var(--line) !important; flex:0 0 84px; }
+  .btn-next{ background:linear-gradient(135deg, var(--amber), #c97f22); color:#241703; box-shadow:0 6px 16px rgba(232,163,61,0.3); }
+  .btn-next:disabled{ opacity:0.55; }
+
+  /* Review page */
+  .scorewrap{ display:flex; align-items:center; gap:16px; margin:6px 0 4px; }
+  .ring{ width:82px; height:82px; flex:none; position:relative; }
+  .ring svg{ width:100%; height:100%; transform:rotate(-90deg); }
+  .ring .pct{
+    position:absolute; inset:0; display:flex; align-items:center; justify-content:center;
+    font-family:-apple-system,sans-serif; font-weight:800; font-size:18px; color:var(--paper);
+  }
+  .score-desc{ font-size:13px; color:var(--paper-dim); font-family:-apple-system,sans-serif; line-height:1.5; }
+
+  .summary-item{
+    border-top:1px dashed var(--line); padding:11px 0; font-family:-apple-system,sans-serif;
+  }
+  .summary-item:first-child{ border-top:none; }
+  .summary-item .si-head{ display:flex; justify-content:space-between; font-size:13.5px; font-weight:700; color:var(--amber-2); margin-bottom:3px;}
+  .summary-item .si-body{ font-size:13px; color:var(--paper-dim); line-height:1.5; }
+  .badge-ok{ color:var(--teal); font-size:11.5px; }
+  .badge-warn{ color:var(--red); font-size:11.5px; }
+
+  .integrity-box{ display:flex; gap:12px; align-items:flex-start; font-family:-apple-system,sans-serif; }
+  .integrity-num{ font-size:26px; font-weight:800; color:var(--amber-2); line-height:1; }
+  .integrity-txt{ font-size:12.5px; color:var(--paper-dim); line-height:1.5; margin-top:2px; }
+
+  .key-block{ font-family:-apple-system,sans-serif; font-size:13px; line-height:1.65; color:var(--paper-dim); }
+  .key-block h4{ color:var(--amber-2); font-size:13.5px; margin:14px 0 5px; }
+  .key-block h4:first-child{ margin-top:0; }
+
+  .export-row{ display:flex; flex-direction:column; gap:10px; margin-top:6px; }
+  .btn-export{
+    font-family:-apple-system,sans-serif; font-size:14.5px; font-weight:700;
+    padding:14px; border-radius:12px; border:1.5px solid var(--line); cursor:pointer;
+    display:flex; align-items:center; justify-content:center; gap:9px;
+  }
+  .btn-pdf{ background:linear-gradient(135deg, var(--teal), #1c7a6d); color:#082420; border-color:transparent; }
+  .btn-txt{ background:rgba(255,255,255,0.06); color:var(--paper); }
+  .btn-reset{ background:transparent; color:var(--red); border-color:rgba(255,107,87,0.35); font-size:13px; padding:11px; }
+
+  .bonus-locked{ font-family:-apple-system,sans-serif; font-size:13.5px; color:var(--paper-dim); line-height:1.6; text-align:center; padding:14px 4px; }
+
+  /* Print-only mirror, built dynamically at export time */
+  #printArea{ display:none; }
+
+  @media print{
+    header.topbar, .navbar, .toast{ display:none !important; }
+    #app > main{ padding:0 !important; }
+    .step{ display:none !important; }
+    #printArea{
+      display:block !important; background:#fff; color:#111;
+      font-family: Georgia, serif;
+    }
+    body{ background:#fff !important; color:#111 !important; }
+  }
+</style>
+</head>
+<body>
+<div id="app">
+
+  <header class="topbar">
+    <div class="brand">
+      <div class="badge">🔎</div>
+      <div>
+        <h1>Misi Detektif Materi</h1>
+        <p>Proyek IPAS · Klasifikasi Materi · SMK Negeri 6 Makassar</p>
+      </div>
+    </div>
+    <div class="progresswrap">
+      <div class="progress-label"><span id="progLabel">LANGKAH 1 DARI 8</span><span id="progPct">0%</span></div>
+      <div class="progress-track"><div class="progress-fill" id="progFill"></div></div>
+    </div>
+  </header>
+
+  <main>
+
+    <!-- STEP 0: IDENTITAS -->
+    <section class="step" data-step="0">
+      <div class="card">
+        <span class="tag">BERKAS KASUS · BARU</span>
+        <h2 class="step-title">Selamat Datang, Detektif</h2>
+        <p class="lede">Di kelas, kantin, atau halaman sekolah, ada <b>5 benda</b> yang menyimpan petunjuk tentang wujud dan komposisinya. Tugasmu: temukan, selidiki, dan catat semua buktinya di sini. Isi identitasmu dulu untuk membuka berkas kasus.</p>
+
+        <label class="field-label">Nama Lengkap</label>
+        <input type="text" id="f-nama" placeholder="Tulis nama lengkapmu" autocomplete="off">
+        <div class="error-msg">Nama wajib diisi.</div>
+
+        <label class="field-label">Kelas</label>
+        <input type="text" id="f-kelas" placeholder="Contoh: X Akuntansi 2" autocomplete="off">
+        <div class="error-msg">Kelas wajib diisi.</div>
+
+        <label class="field-label">Nomor Absen</label>
+        <input type="text" id="f-absen" placeholder="Contoh: 17" inputmode="numeric" autocomplete="off">
+        <div class="error-msg">Nomor absen wajib diisi.</div>
+      </div>
+    </section>
+
+    <!-- STEPS 1-5: BENDA (generated by JS) -->
+    <div id="bendaSteps"></div>
+
+    <!-- STEP 6: BONUS -->
+    <section class="step" data-step="6">
+      <div class="card">
+        <span class="tag">MISI BONUS · KREATIVITAS</span>
+        <h2 class="step-title">Rencana Pemisahan Campuran</h2>
+        <div id="bonusLocked" class="bonus-locked" style="display:none;">
+          🔒 Misi bonus ini terbuka kalau minimal satu bendamu ditandai sebagai <b style="color:var(--paper)">Campuran Heterogen</b>. Tandai dulu di Bukti 1–5, atau lewati misi ini dan lanjut ke laporan akhir.
+        </div>
+        <div id="bonusOpen" style="display:none;">
+          <p class="lede">Pilih satu benda campuran heterogen dari daftarmu, lalu rancang cara memisahkan komponen-komponennya.</p>
+          <label class="field-label">Benda mana yang kamu selidiki?</label>
+          <div class="chiprow" id="bonusPickRow"></div>
+          <div class="error-msg" id="bonusPickErr">Pilih salah satu benda dulu.</div>
+
+          <label class="field-label">Metode pemisahan &amp; alasanmu
+            <small>Boleh pakai istilah: penyaringan, penguapan, pengendapan, atau penyulingan.</small>
+          </label>
+          <textarea id="f-bonusAlasan" rows="3" placeholder="Contoh: aku akan menggunakan ... karena ..."></textarea>
+
+          <label class="field-label">Sketsa idemu <small>(opsional)</small></label>
+          <div class="canvasbox" data-forkey="bonus">
+            <div class="swatches" data-swatches></div>
+            <div class="toolrow">
+              <div class="sizes" data-sizes>
+                <div class="brush-dot size-s" data-size="2"></div>
+                <div class="brush-dot size-m" data-size="5"></div>
+                <div class="brush-dot size-l" data-size="10"></div>
+              </div>
+              <div class="tools">
+                <button type="button" class="tool-btn" data-tool="pen" title="Pena">✏️</button>
+                <button type="button" class="tool-btn" data-tool="eraser" title="Penghapus">🧽</button>
+                <button type="button" class="tool-btn" data-action="undo" title="Undo">↺</button>
+              </div>
+            </div>
+            <canvas class="sketch" id="cv-bonus"></canvas>
+            <div class="canvas-toolbar">
+              <span class="opt-label">Gambar dengan jari</span>
+              <button type="button" class="btn-mini" data-clear="bonus">Hapus semua</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- STEP 7: REVIEW -->
+    <section class="step" data-step="7">
+      <div class="card">
+        <span class="tag">LAPORAN AKHIR</span>
+        <h2 class="step-title">Berkas Kasus Selesai</h2>
+        <div class="scorewrap">
+          <div class="ring">
+            <svg viewBox="0 0 80 80">
+              <circle cx="40" cy="40" r="34" stroke="rgba(255,255,255,0.1)" stroke-width="8" fill="none"/>
+              <circle cx="40" cy="40" r="34" stroke="url(#gradring)" stroke-width="8" fill="none" stroke-linecap="round" id="ringProgress" stroke-dasharray="213.6" stroke-dashoffset="213.6"/>
+              <defs><linearGradient id="gradring" x1="0" y1="0" x2="1" y2="1"><stop offset="0%" stop-color="#e8a33d"/><stop offset="100%" stop-color="#2fb6a3"/></linearGradient></defs>
+            </svg>
+            <div class="pct" id="scorePct">0%</div>
+          </div>
+          <div class="score-desc" id="scoreDesc">Skor kelengkapan pengisian. Ini <b>bukan</b> nilai kebenaran jawaban — guru akan menilai isi jawabanmu secara manual.</div>
+        </div>
+      </div>
+
+      <div class="card">
+        <span class="tag">RINGKASAN BUKTI</span>
+        <div id="reviewList"></div>
+      </div>
+
+      <div class="card">
+        <span class="tag">LAPORAN PENGERJAAN</span>
+        <div class="integrity-box">
+          <div class="integrity-num" id="tabCount">0</div>
+          <div class="integrity-txt">kali berpindah ke tab/aplikasi lain selama mengerjakan. Data ini ikut tersimpan sebagai bagian dari laporan pengerjaanmu.</div>
+        </div>
+      </div>
+
+      <div class="card">
+        <span class="tag">PEMBAHASAN SINGKAT</span>
+        <div class="key-block">
+          <h4>Klasifikasi berdasarkan wujud</h4>
+          <p><b style="color:var(--paper)">Padat</b>: bentuk & volume tetap. <b style="color:var(--paper)">Cair</b>: bentuk mengikuti wadah, volume tetap. <b style="color:var(--paper)">Gas</b>: bentuk & volume berubah, memenuhi seluruh ruang.</p>
+          <h4>Klasifikasi berdasarkan komposisi</h4>
+          <p><b style="color:var(--paper)">Zat tunggal</b>: satu jenis zat, tidak bisa dipisah dengan cara biasa. <b style="color:var(--paper)">Campuran homogen</b>: bercampur rata, komponennya tidak terlihat terpisah. <b style="color:var(--paper)">Campuran heterogen</b>: komponennya masih bisa dibedakan/terlihat.</p>
+          <h4>Metode pemisahan campuran</h4>
+          <p><b style="color:var(--paper)">Filtrasi</b> menyaring padat dari cairan, <b style="color:var(--paper)">evaporasi</b> menguapkan cairan hingga tersisa kristal, <b style="color:var(--paper)">dekantasi</b> mengendapkan lalu menuang cairan bening, <b style="color:var(--paper)">destilasi</b> menguapkan lalu mengembunkan kembali.</p>
+        </div>
+      </div>
+
+      <div class="card">
+        <span class="tag">SIMPAN TUGAS</span>
+        <p class="lede" style="margin-bottom:10px;">Simpan sebagai PDF untuk dikumpulkan. Kalau PDF gagal tersimpan di HP-mu, pakai tombol cadangan .txt.</p>
+        <div class="export-row">
+          <button type="button" class="btn-export btn-pdf" id="btnExportPdf">📄 Simpan sebagai PDF</button>
+          <button type="button" class="btn-export btn-txt" id="btnExportTxt">💾 Unduh sebagai .txt (cadangan)</button>
+          <button type="button" class="btn-export btn-reset" id="btnReset">Mulai Ulang (hapus semua jawaban)</button>
+        </div>
+      </div>
+    </section>
+
+  </main>
+
+  <nav class="navbar">
+    <div class="navbar-inner">
+      <button type="button" class="nav-btn btn-prev" id="btnPrev">Kembali</button>
+      <button type="button" class="nav-btn btn-next" id="btnNext">Lanjut</button>
+    </div>
+  </nav>
+
+  <div class="toast" id="toast"></div>
+  <div class="modal" id="resetModal">
+    <div class="modal-box">
+      <h3>Mulai ulang dari awal?</h3>
+      <p>Semua jawaban dan gambar akan dihapus permanen dan tidak bisa dikembalikan.</p>
+      <div class="modal-actions">
+        <button type="button" class="nav-btn btn-prev" id="resetCancel" style="flex:1">Batal</button>
+        <button type="button" class="nav-btn" id="resetConfirm" style="flex:1;background:var(--red);color:#fff">Ya, hapus semua</button>
+      </div>
+    </div>
+  </div>
+  <div id="printArea"></div>
+</div>
+
+<script>
+(function(){
+  "use strict";
+
+  /* ============ CONFIG ============ */
+  var STORAGE_KEY = "detektifMateri_v1";
+  var TOTAL_STEPS = 8; // 0 identitas, 1-5 benda, 6 bonus, 7 review
+  var WUJUD_OPTS = ["Padat","Cair","Gas"];
+  var KOMPOSISI_OPTS = ["Zat Tunggal","Campuran Homogen","Campuran Heterogen"];
+  var SKETCH_COLORS = ["#1c2545","#ffffff","#e63946","#e8a33d","#f4d35e","#4caf50","#2fb6a3","#2f6fed","#5b4fc4","#9b5de5","#ef476f","#8d5a2b"];
+  var toolState = { color: SKETCH_COLORS[0], size: 5, tool: "pen" };
+  var HISTORY_CAP = 20;
+
+  /* ============ STATE ============ */
+  var state = {
+    nama:"", kelas:"", absen:"",
+    benda: [0,1,2,3,4].map(function(){ return {nama:"", wujud:"", komposisi:"", alasan:"", sketch:null}; }),
+    bonus: { pick:null, alasan:"", sketch:null },
+    tabSwitchCount: 0
+  };
+  var current = 0;
+  var canvasInited = {}; // key -> bool
+  var canvasCtx = {};    // key -> {canvas, ctx, drawing}
+
+  /* ============ UTIL ============ */
+  function $(sel, root){ return (root||document).querySelector(sel); }
+  function $all(sel, root){ return Array.prototype.slice.call((root||document).querySelectorAll(sel)); }
+  function debounce(fn, ms){ var t; return function(){ var a=arguments,ctx=this; clearTimeout(t); t=setTimeout(function(){ fn.apply(ctx,a); }, ms); }; }
+  function sanitizeFilename(s){
+    return (s||"").toString().trim().replace(/[\\\/:*?"<>|]/g,"").replace(/\s+/g,"_") || "-";
+  }
+  function escapeHtml(s){
+    return (s||"").toString().replace(/[&<>"']/g, function(c){
+      return {"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c];
+    });
+  }
+
+  function showToast(msg){
+    var t = $("#toast");
+    t.textContent = msg;
+    t.classList.add("show");
+    clearTimeout(showToast._h);
+    showToast._h = setTimeout(function(){ t.classList.remove("show"); }, 1800);
+  }
+
+  /* ============ PERSISTENCE ============ */
+  var resetting = false; // true while "Mulai Ulang" is in progress: blocks every save
+  var saveNow = function(){
+    if(resetting) return;
+    try{
+      localStorage.setItem(STORAGE_KEY, JSON.stringify({state:state, current:current}));
+    }catch(e){ /* storage may be unavailable; fail silently, in-memory state still works */ }
+  };
+  var saveDebounced = debounce(saveNow, 300);
+
+  function loadSaved(){
+    try{
+      var raw = localStorage.getItem(STORAGE_KEY);
+      if(!raw) return;
+      var parsed = JSON.parse(raw);
+      if(parsed && parsed.state){
+        state = parsed.state;
+        // defensive defaults in case of older/partial saves
+        if(!state.benda || state.benda.length!==5){
+          state.benda = [0,1,2,3,4].map(function(){ return {nama:"", wujud:"", komposisi:"", alasan:"", sketch:null}; });
+        }
+        if(!state.bonus) state.bonus = { pick:null, alasan:"", sketch:null };
+        if(typeof state.tabSwitchCount!=="number") state.tabSwitchCount = 0;
+        current = parsed.current || 0;
+      }
+    }catch(e){ /* ignore corrupted data */ }
+  }
+
+  /* ============ BUILD BENDA STEPS (DOM) ============ */
+  function buildBendaSteps(){
+    var wrap = $("#bendaSteps");
+    var html = "";
+    for(var i=0;i<5;i++){
+      html += bendaStepHtml(i);
+    }
+    wrap.innerHTML = html;
+  }
+
+  function chipRowHtml(name, opts, groupKey, idx){
+    var html = '<div class="chiprow" data-group="'+groupKey+'" data-idx="'+idx+'">';
+    opts.forEach(function(opt){
+      html += '<div class="chip" data-value="'+opt+'">'+opt+'</div>';
+    });
+    html += '</div><div class="error-msg" data-err-for="'+groupKey+idx+'">Pilih salah satu.</div>';
+    return html;
+  }
+
+  function bendaStepHtml(i){
+    var n = i+1;
+    return (
+      '<section class="step" data-step="'+n+'">' +
+        '<div class="card">' +
+          '<span class="tag">BUKTI #'+n+' DARI 5</span>' +
+          '<h2 class="step-title">Selidiki Benda Ke-'+n+'</h2>' +
+          '<p class="lede">Cari satu benda di sekitarmu yang belum kamu catat, lalu jawab pertanyaannya.</p>' +
+
+          '<label class="field-label">Nama benda</label>' +
+          '<input type="text" data-field="nama" data-idx="'+i+'" placeholder="Contoh: botol air kelapa, kabut AC, coto Makassar">' +
+          '<div class="error-msg">Nama benda wajib diisi.</div>' +
+
+          '<label class="field-label">Wujudnya apa?</label>' +
+          chipRowHtml("wujud", WUJUD_OPTS, "wujud", i) +
+
+          '<label class="field-label">Komposisinya apa?</label>' +
+          chipRowHtml("komposisi", KOMPOSISI_OPTS, "komposisi", i) +
+
+          '<label class="field-label">Alasan singkat<small>1–2 kalimat, jelaskan mengapa kamu memilih klasifikasi di atas.</small></label>' +
+          '<textarea data-field="alasan" data-idx="'+i+'" rows="2" placeholder="Karena ..."></textarea>' +
+          '<div class="error-msg">Alasan wajib diisi.</div>' +
+
+          '<label class="field-label">Sketsa benda <small>(opsional)</small></label>' +
+          '<div class="canvasbox" data-forkey="benda'+i+'">' +
+            '<div class="swatches" data-swatches></div>' +
+            '<div class="toolrow">' +
+              '<div class="sizes" data-sizes>' +
+                '<div class="brush-dot size-s" data-size="2"></div>' +
+                '<div class="brush-dot size-m" data-size="5"></div>' +
+                '<div class="brush-dot size-l" data-size="10"></div>' +
+              '</div>' +
+              '<div class="tools">' +
+                '<button type="button" class="tool-btn" data-tool="pen" title="Pena">✏️</button>' +
+                '<button type="button" class="tool-btn" data-tool="eraser" title="Penghapus">🧽</button>' +
+                '<button type="button" class="tool-btn" data-action="undo" title="Undo">↺</button>' +
+              '</div>' +
+            '</div>' +
+            '<canvas class="sketch" id="cv-benda'+i+'"></canvas>' +
+            '<div class="canvas-toolbar"><span class="opt-label">Gambar dengan jari</span>' +
+            '<button type="button" class="btn-mini" data-clear="benda'+i+'">Hapus semua</button></div>' +
+          '</div>' +
+        '</div>' +
+      '</section>'
+    );
+  }
+
+  /* ============ RENDER: SYNC DOM FROM STATE ============ */
+  function hydrateStep0(){
+    $("#f-nama").value = state.nama;
+    $("#f-kelas").value = state.kelas;
+    $("#f-absen").value = state.absen;
+  }
+
+  function hydrateBendaStep(i){
+    var root = $('.step[data-step="'+(i+1)+'"]');
+    var b = state.benda[i];
+    $('[data-field="nama"][data-idx="'+i+'"]', root).value = b.nama;
+    $('[data-field="alasan"][data-idx="'+i+'"]', root).value = b.alasan;
+    autoGrow($('[data-field="alasan"][data-idx="'+i+'"]', root));
+    setChipSelection(root, "wujud", i, b.wujud);
+    setChipSelection(root, "komposisi", i, b.komposisi);
+  }
+
+  function setChipSelection(root, group, idx, value){
+    var row = $('.chiprow[data-group="'+group+'"][data-idx="'+idx+'"]', root);
+    if(!row) return;
+    $all(".chip", row).forEach(function(c){
+      c.classList.toggle("sel", c.getAttribute("data-value")===value);
+    });
+  }
+
+  function autoGrow(el){
+    if(!el) return;
+    el.style.height = "auto";
+    el.style.height = (el.scrollHeight+2) + "px";
+  }
+
+  /* ============ BONUS STEP LOGIC ============ */
+  function refreshBonusVisibility(){
+    var heteroList = [];
+    state.benda.forEach(function(b, idx){
+      if(b.komposisi === "Campuran Heterogen" && b.nama.trim()){
+        heteroList.push({idx:idx, nama:b.nama});
+      }
+    });
+    var locked = $("#bonusLocked"), open = $("#bonusOpen");
+    if(heteroList.length===0){
+      locked.style.display = "block";
+      open.style.display = "none";
+      return;
+    }
+    locked.style.display = "none";
+    open.style.display = "block";
+
+    var row = $("#bonusPickRow");
+    row.innerHTML = heteroList.map(function(h){
+      return '<div class="chip" data-value="'+h.idx+'">'+escapeHtml(h.nama)+'</div>';
+    }).join("");
+    $all(".chip", row).forEach(function(c){
+      c.classList.toggle("sel", String(state.bonus.pick)===c.getAttribute("data-value"));
+      c.addEventListener("click", function(){
+        state.bonus.pick = parseInt(c.getAttribute("data-value"),10);
+        $all(".chip", row).forEach(function(x){ x.classList.remove("sel"); });
+        c.classList.add("sel");
+        row.closest(".card").querySelector('[data-field-group="bonusPick"]');
+        clearFieldError(row);
+        saveDebounced();
+      });
+    });
+    $("#f-bonusAlasan").value = state.bonus.alasan;
+    autoGrow($("#f-bonusAlasan"));
+  }
+
+  /* ============ EVENTS: TEXT / CHIP INPUT ============ */
+  document.addEventListener("input", function(e){
+    var t = e.target;
+    if(t.id==="f-nama"){ state.nama = t.value; clearFieldError(t); saveDebounced(); }
+    else if(t.id==="f-kelas"){ state.kelas = t.value; clearFieldError(t); saveDebounced(); }
+    else if(t.id==="f-absen"){ state.absen = t.value; clearFieldError(t); saveDebounced(); }
+    else if(t.id==="f-bonusAlasan"){ state.bonus.alasan = t.value; autoGrow(t); saveDebounced(); }
+    else if(t.matches('[data-field="nama"]')){
+      state.benda[+t.getAttribute("data-idx")].nama = t.value; clearFieldError(t); saveDebounced();
+    }
+    else if(t.matches('[data-field="alasan"]')){
+      state.benda[+t.getAttribute("data-idx")].alasan = t.value; autoGrow(t); clearFieldError(t); saveDebounced();
+    }
+  });
+
+  document.addEventListener("click", function(e){
+    var chip = e.target.closest(".chip");
+    if(chip && chip.closest(".chiprow") && chip.closest(".chiprow").getAttribute("data-group")){
+      var row = chip.closest(".chiprow");
+      var group = row.getAttribute("data-group");
+      var idx = +row.getAttribute("data-idx");
+      $all(".chip", row).forEach(function(c){ c.classList.remove("sel"); });
+      chip.classList.add("sel");
+      var val = chip.getAttribute("data-value");
+      if(group==="wujud") state.benda[idx].wujud = val;
+      if(group==="komposisi"){
+        state.benda[idx].komposisi = val;
+        refreshBonusVisibility();
+      }
+      clearFieldError(row);
+      saveDebounced();
+    }
+    var clearBtn = e.target.closest("[data-clear]");
+    if(clearBtn){
+      var key = clearBtn.getAttribute("data-clear");
+      clearCanvas(key);
+    }
+  });
+
+  function clearFieldError(el){
+    var wrap = el.closest(".card") ? el : el;
+    var holder = el.classList && el.classList.contains("chiprow") ? el.parentElement : el.parentElement;
+    if(el.classList && el.classList.contains("chiprow")){
+      el.parentElement && el.parentElement.classList && el.parentElement.classList.remove("field-error");
+      el.classList.remove("field-error");
+    }
+    var p = el.closest(".field-error");
+    if(p) p.classList.remove("field-error");
+  }
+
+  /* ============ ANTI-CHEAT ============ */
+  document.addEventListener("paste", function(e){
+    if(e.target && (e.target.tagName==="TEXTAREA")){
+      e.preventDefault();
+      showToast("⛔ Menempel teks tidak diizinkan di tugas ini.");
+    }
+  }, true);
+  document.addEventListener("drop", function(e){
+    if(e.target && (e.target.tagName==="TEXTAREA")){
+      e.preventDefault();
+      showToast("⛔ Menempel/menjatuhkan teks tidak diizinkan di tugas ini.");
+    }
+  }, true);
+  document.addEventListener("contextmenu", function(e){
+    if(e.target && e.target.tagName==="TEXTAREA"){
+      e.preventDefault();
+    }
+  });
+  document.addEventListener("visibilitychange", function(){
+    if(document.hidden){
+      state.tabSwitchCount++;
+      saveNow();
+    }
+  });
+
+  /* ============ CANVAS DRAWING ============
+     Design note: a canvas's pixel buffer is initialized exactly once, the
+     first time its step becomes visible, using getBoundingClientRect() at
+     that moment. It is never re-measured or resized afterwards (not on
+     window "resize", not before export/print) — the drawn bitmap is simply
+     scaled visually by CSS. This is what prevents the "blank canvas on
+     export" bug: we never ask a hidden (display:none) canvas for its
+     rect, and toDataURL() always reads the persisted bitmap regardless of
+     current visibility. */
+  function getCanvasEl(key){
+    return key==="bonus" ? $("#cv-bonus") : $("#cv-"+key);
+  }
+  function stateSketchRef(key){
+    if(key==="bonus") return state.bonus;
+    var idx = +key.replace("benda","");
+    return state.benda[idx];
+  }
+
+  function populateSwatches(){
+    $all("[data-swatches]").forEach(function(row){
+      row.innerHTML = SKETCH_COLORS.map(function(c){
+        return '<div class="swatch" data-color="'+c+'" style="background:'+c+'"></div>';
+      }).join("");
+    });
+    syncToolbarUI();
+  }
+
+  function syncToolbarUI(){
+    $all(".swatch").forEach(function(s){
+      s.classList.toggle("sel", s.getAttribute("data-color")===toolState.color);
+    });
+    $all(".brush-dot").forEach(function(d){
+      d.classList.toggle("sel", +d.getAttribute("data-size")===toolState.size);
+    });
+    $all('.tool-btn[data-tool]').forEach(function(b){
+      b.classList.toggle("sel", b.getAttribute("data-tool")===toolState.tool);
+    });
+  }
+
+  document.addEventListener("click", function(e){
+    var sw = e.target.closest(".swatch");
+    if(sw){ toolState.color = sw.getAttribute("data-color"); toolState.tool = "pen"; syncToolbarUI(); return; }
+    var bd = e.target.closest(".brush-dot");
+    if(bd){ toolState.size = +bd.getAttribute("data-size"); syncToolbarUI(); return; }
+    var tb = e.target.closest("[data-tool]");
+    if(tb){ toolState.tool = tb.getAttribute("data-tool"); syncToolbarUI(); return; }
+    var ub = e.target.closest('[data-action="undo"]');
+    if(ub){
+      var box = ub.closest("[data-forkey]");
+      if(box) undoCanvas(box.getAttribute("data-forkey"));
+      return;
+    }
+  });
+
+  function snapshotHistory(key){
+    var c = canvasCtx[key];
+    if(!c) return;
+    c.history.push(c.canvas.toDataURL("image/png"));
+    if(c.history.length > HISTORY_CAP) c.history.shift();
+  }
+
+  function restoreFromDataUrl(key, dataUrl, cssW, cssH){
+    var c = canvasCtx[key];
+    if(!c) return;
+    c.ctx.clearRect(0,0,c.canvas.width,c.canvas.height);
+    if(!dataUrl) return;
+    var img = new Image();
+    img.onload = function(){
+      c.ctx.clearRect(0,0,c.canvas.width,c.canvas.height);
+      c.ctx.drawImage(img, 0, 0, cssW, cssH);
+    };
+    img.src = dataUrl;
+  }
+
+  function undoCanvas(key){
+    var c = canvasCtx[key];
+    if(!c || c.history.length===0){ showToast("Tidak ada coretan untuk dibatalkan."); return; }
+    var prev = c.history.pop();
+    restoreFromDataUrl(key, prev, c.cssW, c.cssH);
+    setTimeout(function(){ persistCanvas(key); }, 30);
+  }
+
+  function initCanvas(key){
+    if(canvasInited[key]) return;
+    var canvas = getCanvasEl(key);
+    if(!canvas) return;
+    var rect = canvas.getBoundingClientRect();
+    if(rect.width===0 || rect.height===0) return; // not actually visible yet; try again next time it's shown
+    var dpr = window.devicePixelRatio || 1;
+    canvas.width = Math.round(rect.width * dpr);
+    canvas.height = Math.round(rect.height * dpr);
+    var ctx = canvas.getContext("2d");
+    ctx.scale(dpr, dpr);
+    ctx.lineJoin = "round";
+    ctx.lineCap = "round";
+    canvasCtx[key] = { canvas:canvas, ctx:ctx, drawing:false, dpr:dpr, cssW:rect.width, cssH:rect.height, history:[] };
+    canvasInited[key] = true;
+
+    // restore saved drawing, if any
+    var ref = stateSketchRef(key);
+    if(ref.sketch){
+      var img = new Image();
+      img.onload = function(){ ctx.drawImage(img, 0, 0, rect.width, rect.height); };
+      img.src = ref.sketch;
+    }
+
+    function pos(e){
+      var r = canvas.getBoundingClientRect();
+      var cx = (e.touches ? e.touches[0].clientX : e.clientX) - r.left;
+      var cy = (e.touches ? e.touches[0].clientY : e.clientY) - r.top;
+      return {x:cx, y:cy};
+    }
+    function start(e){
+      e.preventDefault();
+      snapshotHistory(key);
+      canvasCtx[key].drawing = true;
+      ctx.globalCompositeOperation = toolState.tool==="eraser" ? "destination-out" : "source-over";
+      ctx.strokeStyle = toolState.color;
+      ctx.lineWidth = toolState.tool==="eraser" ? toolState.size*3.2 : toolState.size;
+      var p = pos(e);
+      ctx.beginPath();
+      ctx.moveTo(p.x, p.y);
+      ctx.lineTo(p.x+0.01, p.y+0.01);
+      ctx.stroke(); // registers a dot for taps, not just drags
+    }
+    function move(e){
+      if(!canvasCtx[key].drawing) return;
+      e.preventDefault();
+      var p = pos(e);
+      ctx.lineTo(p.x, p.y);
+      ctx.stroke();
+    }
+    function end(e){
+      if(!canvasCtx[key].drawing) return;
+      canvasCtx[key].drawing = false;
+      ctx.globalCompositeOperation = "source-over";
+      persistCanvas(key);
+    }
+    canvas.addEventListener("pointerdown", start);
+    canvas.addEventListener("pointermove", move);
+    window.addEventListener("pointerup", end);
+    canvas.addEventListener("touchstart", start, {passive:false});
+    canvas.addEventListener("touchmove", move, {passive:false});
+    canvas.addEventListener("touchend", end);
+  }
+
+  function persistCanvas(key){
+    var c = canvasCtx[key];
+    if(!c) return;
+    var dataUrl = c.canvas.toDataURL("image/png");
+    stateSketchRef(key).sketch = dataUrl;
+    saveDebounced();
+  }
+
+  function clearCanvas(key){
+    var c = canvasCtx[key];
+    if(c){
+      snapshotHistory(key);
+      c.ctx.clearRect(0,0,c.canvas.width,c.canvas.height);
+    }
+    stateSketchRef(key).sketch = null;
+    saveNow();
+  }
+
+  /* ============ VALIDATION ============ */
+  function markError(el, on){
+    var target = el;
+    if(el.classList.contains("chiprow")) target = el;
+    if(on) target.classList.add("field-error"); else target.classList.remove("field-error");
+    if(el.tagName==="INPUT" || el.tagName==="TEXTAREA"){
+      if(on) el.classList.add("field-error"); else el.classList.remove("field-error");
+    }
+  }
+
+  function validateStep(n){
+    var ok = true;
+    if(n===0){
+      var checks = [["f-nama", state.nama], ["f-kelas", state.kelas], ["f-absen", state.absen]];
+      checks.forEach(function(c){
+        var el = $("#"+c[0]);
+        var valid = c[1] && c[1].trim().length>0;
+        markError(el, !valid);
+        if(!valid) ok = false;
+      });
+    } else if(n>=1 && n<=5){
+      var i = n-1;
+      var root = $('.step[data-step="'+n+'"]');
+      var b = state.benda[i];
+      var namaEl = $('[data-field="nama"][data-idx="'+i+'"]', root);
+      var validNama = b.nama && b.nama.trim().length>0;
+      markError(namaEl, !validNama); if(!validNama) ok=false;
+
+      var wujudRow = $('.chiprow[data-group="wujud"][data-idx="'+i+'"]', root);
+      var validWujud = !!b.wujud;
+      markError(wujudRow, !validWujud); if(!validWujud) ok=false;
+
+      var komposisiRow = $('.chiprow[data-group="komposisi"][data-idx="'+i+'"]', root);
+      var validKomposisi = !!b.komposisi;
+      markError(komposisiRow, !validKomposisi); if(!validKomposisi) ok=false;
+
+      var alasanEl = $('[data-field="alasan"][data-idx="'+i+'"]', root);
+      var validAlasan = b.alasan && b.alasan.trim().length>0;
+      markError(alasanEl, !validAlasan); if(!validAlasan) ok=false;
+
+      if(!ok) showToast("Lengkapi dulu bagian yang ditandai merah.");
+    }
+    // step 6 (bonus) and 7 (review) have no blocking validation
+    return ok;
+  }
+
+  /* ============ NAVIGATION ============ */
+  function renderStep(){
+    $all(".step").forEach(function(s){
+      s.classList.toggle("active", +s.getAttribute("data-step")===current);
+    });
+    var pct = Math.round(((current+1)/TOTAL_STEPS)*100);
+    $("#progLabel").textContent = "LANGKAH "+(current+1)+" DARI "+TOTAL_STEPS;
+    $("#progPct").textContent = pct+"%";
+    $("#progFill").style.width = pct+"%";
+
+    $("#btnPrev").style.visibility = current===0 ? "hidden" : "visible";
+    $("#btnNext").textContent = current===7 ? "Lihat Laporan" : (current===6 ? "Lanjut ke Laporan" : "Lanjut");
+    if(current===7) $("#btnNext").style.display = "none"; else $("#btnNext").style.display = "block";
+
+    if(current===0) hydrateStep0();
+    if(current>=1 && current<=5){
+      hydrateBendaStep(current-1);
+      requestAnimationFrame(function(){ initCanvas("benda"+(current-1)); });
+    }
+    if(current===6){
+      refreshBonusVisibility();
+      requestAnimationFrame(function(){ initCanvas("bonus"); });
+    }
+    if(current===7){
+      renderReview();
+    }
+    window.scrollTo({top:0, behavior:"instant"});
+  }
+
+  $("#btnNext").addEventListener("click", function(){
+    if(current<=5){
+      if(!validateStep(current)) return;
+    }
+    if(current < 7){
+      current++;
+      renderStep();
+      saveNow();
+    }
+  });
+  $("#btnPrev").addEventListener("click", function(){
+    if(current>0){
+      current--;
+      renderStep();
+      saveNow();
+    }
+  });
+
+  /* ============ SCORING ============ */
+  function computeScore(){
+    var total = 3 + (5*4); // identitas + 5x(nama,wujud,komposisi,alasan)
+    var filled = 0;
+    if(state.nama && state.nama.trim()) filled++;
+    if(state.kelas && state.kelas.trim()) filled++;
+    if(state.absen && state.absen.trim()) filled++;
+    state.benda.forEach(function(b){
+      if(b.nama && b.nama.trim()) filled++;
+      if(b.wujud) filled++;
+      if(b.komposisi) filled++;
+      if(b.alasan && b.alasan.trim()) filled++;
+    });
+    return Math.round((filled/total)*100);
+  }
+  function bonusDone(){
+    return state.bonus.pick!==null && state.bonus.alasan && state.bonus.alasan.trim().length>0;
+  }
+
+  /* ============ REVIEW RENDER ============ */
+  function renderReview(){
+    var score = computeScore();
+    $("#scorePct").textContent = score+"%";
+    var circumference = 213.6;
+    var offset = circumference - (circumference*score/100);
+    $("#ringProgress").setAttribute("stroke-dashoffset", offset);
+
+    var list = $("#reviewList");
+    var html = "";
+    state.benda.forEach(function(b, i){
+      var complete = b.nama && b.wujud && b.komposisi && b.alasan;
+      html += '<div class="summary-item">' +
+        '<div class="si-head"><span>Bukti #'+(i+1)+': '+ (b.nama? escapeHtml(b.nama) : "(belum diisi)") +'</span>' +
+        '<span class="'+(complete?"badge-ok":"badge-warn")+'">'+(complete?"Lengkap":"Belum lengkap")+'</span></div>' +
+        '<div class="si-body">'+(b.wujud? escapeHtml(b.wujud) : "—")+' · '+(b.komposisi? escapeHtml(b.komposisi) : "—")+'</div>' +
+      '</div>';
+    });
+    html += '<div class="summary-item"><div class="si-head"><span>Misi Bonus</span>' +
+      '<span class="'+(bonusDone()?"badge-ok":"badge-warn")+'">'+(bonusDone()?"Dikerjakan":"Belum/tidak dikerjakan")+'</span></div>' +
+      '<div class="si-body">Poin bonus tidak memengaruhi skor kelengkapan di atas.</div></div>';
+    list.innerHTML = html;
+
+    $("#tabCount").textContent = state.tabSwitchCount;
+  }
+
+  /* ============ EXPORT: PDF (print) ============ */
+  function buildPrintView(){
+    var fname = "TM 1_"+state.nama+"_"+state.kelas+"_"+state.absen;
+    var html = "";
+    html += '<div style="padding:26px;">';
+    html += '<h1 style="font-size:20px;margin:0 0 4px;">Misi Detektif Materi — Laporan Tugas Mandiri</h1>';
+    html += '<p style="font-size:12px;color:#555;margin:0 0 18px;">Proyek IPAS · Klasifikasi Materi · SMK Negeri 6 Makassar</p>';
+    html += '<table style="font-size:13px;margin-bottom:18px;"><tr><td style="padding:2px 10px 2px 0;"><b>Nama</b></td><td>: '+escapeHtml(state.nama)+'</td></tr>';
+    html += '<tr><td style="padding:2px 10px 2px 0;"><b>Kelas</b></td><td>: '+escapeHtml(state.kelas)+'</td></tr>';
+    html += '<tr><td style="padding:2px 10px 2px 0;"><b>No. Absen</b></td><td>: '+escapeHtml(state.absen)+'</td></tr>';
+    html += '<tr><td style="padding:2px 10px 2px 0;"><b>Skor kelengkapan</b></td><td>: '+computeScore()+'%</td></tr>';
+    html += '<tr><td style="padding:2px 10px 2px 0;"><b>Jumlah pindah tab</b></td><td>: '+state.tabSwitchCount+' kali</td></tr></table>';
+
+    state.benda.forEach(function(b, i){
+      html += '<div style="margin-bottom:20px; page-break-inside:avoid;">';
+      html += '<h3 style="font-size:14.5px;margin:0 0 4px;border-bottom:1px solid #ccc;padding-bottom:4px;">Bukti #'+(i+1)+': '+escapeHtml(b.nama||"-")+'</h3>';
+      html += '<p style="font-size:12.5px;margin:4px 0;"><b>Wujud:</b> '+escapeHtml(b.wujud||"-")+' &nbsp;&nbsp; <b>Komposisi:</b> '+escapeHtml(b.komposisi||"-")+'</p>';
+      html += '<p style="font-size:12.5px;margin:4px 0;"><b>Alasan:</b> '+escapeHtml(b.alasan||"-")+'</p>';
+      if(b.sketch){
+        html += '<img src="'+b.sketch+'" style="max-width:260px;border:1px solid #ccc;border-radius:6px;margin-top:4px;">';
+      }
+      html += '</div>';
+    });
+
+    html += '<div style="margin-bottom:20px; page-break-inside:avoid;">';
+    html += '<h3 style="font-size:14.5px;margin:0 0 4px;border-bottom:1px solid #ccc;padding-bottom:4px;">Misi Bonus: Pemisahan Campuran</h3>';
+    if(bonusDone()){
+      var pickName = (state.bonus.pick!==null && state.benda[state.bonus.pick]) ? state.benda[state.bonus.pick].nama : "-";
+      html += '<p style="font-size:12.5px;margin:4px 0;"><b>Benda:</b> '+escapeHtml(pickName)+'</p>';
+      html += '<p style="font-size:12.5px;margin:4px 0;"><b>Metode &amp; alasan:</b> '+escapeHtml(state.bonus.alasan)+'</p>';
+      if(state.bonus.sketch){
+        html += '<img src="'+state.bonus.sketch+'" style="max-width:260px;border:1px solid #ccc;border-radius:6px;margin-top:4px;">';
+      }
+    } else {
+      html += '<p style="font-size:12.5px;margin:4px 0;color:#777;">Tidak dikerjakan.</p>';
+    }
+    html += '</div>';
+    html += '</div>';
+
+    $("#printArea").innerHTML = html;
+    return fname;
+  }
+
+  $("#btnExportPdf").addEventListener("click", function(){
+    // Snapshot every canvas's current bitmap into state before building the
+    // print view (toDataURL works on hidden canvases too — no resize needed).
+    Object.keys(canvasCtx).forEach(persistCanvas);
+    var fname = buildPrintView();
+    var oldTitle = document.title;
+    document.title = sanitizeFilename(fname); // browsers commonly suggest this as the PDF filename
+    setTimeout(function(){
+      window.print();
+      setTimeout(function(){ document.title = oldTitle; }, 500);
+    }, 50);
+  });
+
+  $("#btnExportTxt").addEventListener("click", function(){
+    var lines = [];
+    lines.push("MISI DETEKTIF MATERI — LAPORAN TUGAS MANDIRI");
+    lines.push("Proyek IPAS - Klasifikasi Materi - SMK Negeri 6 Makassar");
+    lines.push("");
+    lines.push("Nama   : "+state.nama);
+    lines.push("Kelas  : "+state.kelas);
+    lines.push("Absen  : "+state.absen);
+    lines.push("Skor kelengkapan: "+computeScore()+"%");
+    lines.push("Jumlah pindah tab: "+state.tabSwitchCount+" kali");
+    lines.push("");
+    lines.push("[Catatan: gambar/sketsa hanya tersedia pada versi PDF, tidak ada di file .txt ini]");
+    lines.push("");
+    state.benda.forEach(function(b, i){
+      lines.push("--- Bukti #"+(i+1)+" ---");
+      lines.push("Nama benda : "+(b.nama||"-"));
+      lines.push("Wujud      : "+(b.wujud||"-"));
+      lines.push("Komposisi  : "+(b.komposisi||"-"));
+      lines.push("Alasan     : "+(b.alasan||"-"));
+      lines.push("");
+    });
+    lines.push("--- Misi Bonus ---");
+    if(bonusDone()){
+      var pickName = (state.bonus.pick!==null && state.benda[state.bonus.pick]) ? state.benda[state.bonus.pick].nama : "-";
+      lines.push("Benda selidik : "+pickName);
+      lines.push("Metode&alasan : "+state.bonus.alasan);
+    } else {
+      lines.push("Tidak dikerjakan.");
+    }
+
+    var blob = new Blob([lines.join("\n")], {type:"text/plain;charset=utf-8"});
+    var url = URL.createObjectURL(blob);
+    var a = document.createElement("a");
+    a.href = url;
+    a.download = sanitizeFilename("TM 1_"+state.nama+"_"+state.kelas+"_"+state.absen)+".txt";
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    setTimeout(function(){ URL.revokeObjectURL(url); }, 1000);
+    showToast("File .txt sedang diunduh…");
+  });
+
+  function doReset(){
+    resetting = true; // stops visibilitychange / debounced saves from re-writing old data
+    try{ localStorage.removeItem(STORAGE_KEY); }catch(e){}
+    try{ sessionStorage.clear(); }catch(e){}
+    // fresh in-memory state too, in case reload is blocked
+    state = {
+      nama:"", kelas:"", absen:"",
+      benda: [0,1,2,3,4].map(function(){ return {nama:"", wujud:"", komposisi:"", alasan:"", sketch:null}; }),
+      bonus: { pick:null, alasan:"", sketch:null },
+      tabSwitchCount: 0
+    };
+    window.location.reload();
+  }
+  function openResetModal(){ $("#resetModal").classList.add("show"); }
+  function closeResetModal(){ $("#resetModal").classList.remove("show"); }
+  $("#btnReset").addEventListener("click", openResetModal);
+  $("#resetCancel").addEventListener("click", closeResetModal);
+  $("#resetConfirm").addEventListener("click", doReset);
+
+  /* ============ INIT ============ */
+  function init(){
+    buildBendaSteps();
+    populateSwatches();
+    loadSaved();
+    renderStep();
+  }
+  init();
+
+})();
+</script>
+</body>
+</html>
